@@ -29,10 +29,15 @@
             var namedEmoji = namedEmojiString.split(/,/);
 
             /* A hash with the named emoji as keys */
-            var namedMatchHash = namedEmoji.reduce(function(memo, v) {
+            var namedMatchHash;
+            var namedMatchReHash = function () {
+              namedMatchHash  = namedEmoji.reduce(function(memo, v) {
                 memo[v] = true;
                 return memo;
-            }, {});
+              }, {});
+            };
+            namedMatchReHash();
+
 
             var emoticonsProcessed;
             var emojiMegaRe;
@@ -150,6 +155,7 @@
                     args.node.nextSibling.nodeValue.length
                 );
                 emojiElement.appendChild(args.node.splitText(args.match.index));
+                emojiElement.style.height = getComputedStyle(args.node.parentNode).fontSize;
                 args.node.parentNode.insertBefore(emojiElement, args.node.nextSibling);
             }
 
@@ -246,6 +252,12 @@
                 });
 
             }
+
+            function add() {
+              namedEmoji.push.apply(namedEmoji, arguments);
+              namedMatchReHash();
+            }
+
             function run(el, replacer) {
 
                 // Check if an element was not passed.
@@ -358,6 +370,7 @@
                 // Sane defaults
                 defaultConfig: defaultConfig,
                 emojiNames: namedEmoji,
+                add: add,
                 setConfig: function (newConfig) {
                     Object.keys(defaultConfig).forEach(function(f) {
                         if(f in newConfig) {
